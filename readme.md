@@ -1,8 +1,11 @@
 ## K Means Clustering
 
 
-
 ### K-Means
+
+**Basic Algorithm**
+
+[Wikipedia Breakdown](https://en.wikipedia.org/wiki/K-means_clustering)
 
 ### Fuzzy K-Means
 
