@@ -3,28 +3,27 @@ import numpy as np
 
 
 class KMeansClassifier:
-    def __int__(self, k, iterations, dataSet):
+    def __init__(self, k, iterations, dataSet):
         # number of clusters
         self.K = k
         self.iterations = iterations
-        self.dataSet = dataSet
+        self.dataSet = np.asarray(dataSet, dtype=float)
 
         # stores mean values of the centroids
         self.centroids = []
         # dataframe that holds the centroid minArgResults from kClassifyCall
-        self.centroidPoints =
+        self.centroidPoints = None
 
     def randomizeKCentroids(self):
         # randomly pick K centroids from the data values
-        for k in self.K:
-            # choose a random sample point
-            randomCentroid = self.dataSet.sample(frac=1)
-            self.centroids.append(randomCentroid)
+        self.centroids = np.random.uniform(np.amin(self.dataSet), np.amax(self.dataSet), size=self.K)
+        print(self.centroids)
+
 
 
     def kMeansClassify(self):
         # determine distance from the closest cluster
-        pass;
+        pass
 
 
 
@@ -43,6 +42,8 @@ def readData():
 def main():
     clusterPoints = readData()
     print(clusterPoints)
+    kmeans = KMeansClassifier(5,10, clusterPoints)
+    kmeans.randomizeKCentroids()
 
 
 main()
