@@ -1,6 +1,4 @@
 import math
-import numpy as np
-
 
 def calculateEntrophy(cluster):
     entrophy = 0
@@ -23,16 +21,17 @@ def calculateEntrophy(cluster):
     return -1 * entrophy
 
 
-def calculateMeanEntrophy():
-    pass
 def main():
-    k = input('how many clusters do you need calculated? ')
-    x = 0
-    while x is not k:
+    k = int(input('how many clusters do you need calculated? '))
+    meanClusters = []
+    entropyPerCluster = []
+    for x in range(k):
         clusters = input('provide your list of clusters: ')
+        meanClusters.append(clusters)
         print('calculating entrophy per value in cluster')
-        print(calculateEntrophy(clusters))
-        x += 1
+        clusterEntropy = round(calculateEntrophy(clusters),3)
+        print(clusterEntropy)
+        entropyPerCluster.append(clusterEntropy)
 
 
 main()
