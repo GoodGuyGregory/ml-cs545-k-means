@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-
 class KMeansClassifier:
     def __init__(self, k, iterations, dataSet):
         # number of clusters
@@ -21,11 +20,21 @@ class KMeansClassifier:
         idx = random.sample(temp, self.K)
         self.centroids = self.dataSet[idx]
 
-    def plotData(self, labels):
+    def plotData(self, labels, iteration):
         plt.figure(figsize=(10, 8))
+        plt.title("KMeans Clustering: Iteration:" + str(iteration) + " for K size " + str(self.K))
         plt.scatter(self.dataSet[:, 0], self.dataSet[:, 1], c=labels[:len(self.dataSet)], cmap='viridis', marker='.')
         plt.scatter(self.centroids[:, 0], self.centroids[:, 1], c="black", marker='+', label="Centroids")
         plt.show()
+
+    def calculateSumSquareError(self, labels):
+        sumSquareError = 0
+        for i in range(self.K):
+            cluster_points = self.dataSet[labels == i]
+            centroid = self.centroids[i]
+            distances = np.linalg.norm(cluster_points - centroid, axis=1) ** 2
+            sumSquareError += np.sum(distances)
+        return sumSquareError
 
     def kMeansClassify(self):
         # determine distance from the closest cluster
@@ -57,11 +66,12 @@ class KMeansClassifier:
             clusterCenters = []
             # iterate for each of the cluster we need to pull the specific data points
             # to recalculate the new center values
-            for i,item in enumerate(clusterValues):
-                print("cluster values: " + str(i))
-                print(item.shape)
-                print(item)
-            self.plotData(clusterClasses)
+            # for i,item in enumerate(clusterValues):
+            #     print("cluster values: " + str(i))
+            #     print(item.shape)
+            #     print(item)
+            # if _ % 100 == 0:
+            self.plotData(clusterClasses, _)
             for i, values in enumerate(clusterValues):
                 # case where there are no values assigned to this cluster.
                 if len(values) == 0:
@@ -88,14 +98,22 @@ class FuzzyCMeansClassifier:
         self.centroids = np.array([])
         self.Weights = None
         self.centroidsPoints = None
+        self.labels = None
 
 
-    def plotData(self, labels):
+    def plotData(self, labels, iteration):
         plt.figure(figsize=(10, 8))
+        plt.title("Fuzzy C Means Clustering: Iteration:" + str(iteration) + " for K size " + str(self.K))
         plt.scatter(self.dataSet[:, 0], self.dataSet[:, 1], c=labels[:len(self.dataSet)], cmap='viridis', marker='.')
         plt.scatter(self.centroids[:, 0], self.centroids[:, 1], c="black", marker='+', label="Centroids")
         plt.show()
 
+    def calculateSumSquareError(self):
+        sumSquareError = 0
+        for i, centroid in enumerate(self.centroids):
+            cluster_points = self.dataSet[self.labels == i]
+            sumSquareError += np.sum((cluster_points - centroid) ** 2)
+        return sumSquareError
 
     def randomizeWeights(self):
         self.Weights = np.random.uniform(0.1,1, size=(self.dataSet.shape[0], self.K))
@@ -125,7 +143,8 @@ class FuzzyCMeansClassifier:
                 closestValueDistance = np.argmin(np.sqrt(np.sum((point - self.centroids) ** 2, axis=1)))
                 # add the smallest value index from the list of centroids
                 clusterClasses.append(closestValueDistance)
-            self.plotData(clusterClasses)
+            if iteration % 10 == 0:
+                self.plotData(clusterClasses, iteration)
 
 
             # initialize an empty np array
@@ -141,6 +160,9 @@ class FuzzyCMeansClassifier:
             # transpose to maintain additional iteration
             self.Weights = np.transpose(self.Weights, (1,0))
 
+        # store the labels
+        self.labels = np.argmax(self.Weights, axis=1)
+
 
 
 def readData():
@@ -149,11 +171,14 @@ def readData():
 
 def main():
     clusterPoints = readData()
-    # kmeans = KMeansClassifier(5,10, clusterPoints)
+    # kmeans = KMeansClassifier(3,10, clusterPoints)
     # kmeans.randomizeKCentroids()
     # labeledClusters = kmeans.kMeansClassify()
+    # sumSquareErrorKMeans = kmeans.calculateSumSquareError(labeledClusters)
+    # print("K Means SSE:", sumSquareErrorKMeans)
 
-    cmeans = FuzzyCMeansClassifier(5,2,100, clusterPoints)
+    cmeans = FuzzyCMeansClassifier(5,2,200, clusterPoints)
     cmeans.fuzzyCMeansCluster()
-
+    sse_fcm = cmeans.calculateSumSquareError()
+    print("Fuzzy C Means SSE:", sse_fcm)
 main()
